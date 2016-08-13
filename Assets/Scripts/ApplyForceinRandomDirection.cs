@@ -7,7 +7,7 @@ public class ApplyForceinRandomDirection : MonoBehaviour
 	public float forceAmount=35.0f;
 	public float torque=50.0f;
 	public string buttonName = "Fire1";
-	public Rigidbody rb;
+	public Rigidbody rb; // rigid body comment
  
 	
 	// Update is called once per frame
