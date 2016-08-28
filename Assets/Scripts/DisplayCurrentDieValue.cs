@@ -5,7 +5,7 @@ public class DisplayCurrentDieValue : MonoBehaviour
 {
 	public LayerMask dieValueColliderLayer=-1;
 	public int currentValue=1;
-	public int rollVal=1;
+	public int rollVal=2;
 	public bool rollComplete=false;
 	Rigidbody rb;
 	

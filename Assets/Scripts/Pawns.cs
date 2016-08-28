@@ -13,9 +13,9 @@ public class Pawns : MonoBehaviour
 		CurrentY = y;
 	}
 
-	public virtual 	bool PossibleMove(int x, int y)
+	public virtual 	bool[,] PossibleMove()
 	{
-		return true;
+		return new bool[10,3];
 	}
 
 

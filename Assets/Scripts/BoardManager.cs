@@ -7,19 +7,27 @@ public class BoardManager : MonoBehaviour
 	public static BoardManager Instance{ set; get;}
 	private bool[,] allowedMoves{ set; get;}
 
-
 	public Pawns[,] Pawns{ set; get;}
 	private Pawns selectedPawn;
 	private const float TILE_SIZE=1.0f;
 	private const float TILE_OFFSET=0.5f;
 
-	private int selectionX = -1;
-	private int selectionY = -1;
+	public static int selectionX = -1;
+	public static int selectionY = -1;
 
-	public bool isWhiteTurn=true;
+	public int scoreP1=0;
+	public int scoreP2 = 0;
+	public int moveCounter=1;
+	public static int[] fortOccupied = new int[6];
+
+	public static bool isWhiteTurn=true;
 
 	public List<GameObject> pawnPrefab;
 	private List<GameObject> activePawn= new List<GameObject>(); 
+	public GameObject whiteWin;
+	public GameObject blacWin;
+	public GameObject Dice;
+	public int zeroCounter;
 
 	private void SpawnPawn(int index, int x, int y)
 	{
@@ -55,15 +63,24 @@ public class BoardManager : MonoBehaviour
 	}
 	private void Start()
 	{
+		Instance = this;
 		SpawnAllPieces ();
 	}
-
-
-
+		
 	private void Update()
 	{
 		UpdateSelection ();
 		DrawBoard ();
+		zeroCounter = Dice.GetComponent<DisplayCurrentDieValue> ().currentValue;
+		if (scoreP1 == 4) 
+		{
+			whiteWin.transform.localPosition=new Vector3(5,2,0);
+		}
+		if (scoreP2 == 4) 
+		{
+			blacWin.transform.localPosition=new Vector3(5,2,0);
+		}
+
 
 		if (Input.GetMouseButtonDown (0)) 
 		{
@@ -71,7 +88,7 @@ public class BoardManager : MonoBehaviour
 			{
 				if(selectedPawn==null)
 				{
-					//Select Pawn
+					//Select Pawn by clicking on it.
 					SelectedPawn(selectionX,selectionY);
 				}
 				else
@@ -89,25 +106,86 @@ public class BoardManager : MonoBehaviour
 		{
 			return;
 		}
+/*		if (zeroCounter == 0) // If a Zero is rolled switch turns.
+		{
+			isWhiteTurn= !isWhiteTurn;
+		}*/
 		if (Pawns [x, y].isWhite != isWhiteTurn) 
 		{
 			return;
 		}
-//		allowedMoves = Pawns [x, y].PossibleMove ();
+
+		bool canMove = false;
+		allowedMoves = Pawns [x, y].PossibleMove ();
+		for (int i=0; i<9; i++)
+			for (int j=0; j<3; j++)
+				if (allowedMoves [i, j]) 
+				{
+					canMove = true; 
+					Debug.Log("Can Move");
+				}
+					
+		if (!canMove) 
+		{
+			Debug.Log("Can't Move");
+			return;
+		}
 		selectedPawn = Pawns [x, y];
-//		BoardHighlights.Instance.HighlightAllowedMoves (allowedMoves);
+		BoardHighlights.Instance.HighlightAllowedMoves (allowedMoves);
+
 	}
 
 	private void MovePawn(int x, int y)
 	{
-		if (selectedPawn.PossibleMove(x,y)) 
+		if (allowedMoves[x,y]) 
 		{
+			Pawns P1= Pawns[x,y];
+
+			if(P1!=null && P1.isWhite!=isWhiteTurn)
+			{
+				//Capture Pawn
+				activePawn.Remove(P1.gameObject);
+				if(P1.isWhite)
+				{
+					SpawnPawn(0,7,0);
+				}
+				else
+				{
+					SpawnPawn(1,7,2);
+				}
+				Destroy(P1.gameObject);
+
+			}
+			
 			Pawns[selectedPawn.CurrentX,selectedPawn.CurrentY]=null;
 			selectedPawn.transform.position= GetTile(x,y);
+			selectedPawn.SetPosition(x,y);
 			Pawns[x,y]=selectedPawn;
-			isWhiteTurn=!isWhiteTurn;
+			moveCounter=moveCounter+1;
+			if(selectedPawn.CurrentX==8 && selectedPawn.CurrentY==0)
+			{
+				scoreP1=scoreP1+1;
+				Debug.Log("Score="+scoreP1);
+				Destroy(selectedPawn.gameObject);
+			}
+			if(selectedPawn.CurrentX==8 && selectedPawn.CurrentY==2)
+			{
+				scoreP2=scoreP2+1;
+				Debug.Log("Score="+scoreP2);
+				Destroy(selectedPawn.gameObject);
+			}
+
+//If landing on fortress dont change turn else change turn
+			if((selectedPawn.CurrentX==3 && selectedPawn.CurrentY==1)||(selectedPawn.CurrentX==7 && selectedPawn.CurrentY==1)||(selectedPawn.CurrentX==0 && selectedPawn.CurrentY==0)||(selectedPawn.CurrentX==0 && selectedPawn.CurrentY==2) ||(selectedPawn.CurrentX==8 && selectedPawn.CurrentY==0)||(selectedPawn.CurrentX==8 && selectedPawn.CurrentY==2))
+			{
+				isWhiteTurn=isWhiteTurn;
+			}
+			else
+				isWhiteTurn=!isWhiteTurn;
 		}
+		BoardHighlights.Instance.HideHighlights ();
 		selectedPawn = null;
+
 	}
 
 	private void UpdateSelection()
@@ -115,7 +193,8 @@ public class BoardManager : MonoBehaviour
 		if (!Camera.main)
 			return;
 		RaycastHit hit;
-		if (Physics.Raycast (Camera.main.ScreenPointToRay (Input.mousePosition), out hit, 25.0f, LayerMask.GetMask ("BoardPlane"))) {
+		if (Physics.Raycast (Camera.main.ScreenPointToRay (Input.mousePosition), out hit, 25.0f, LayerMask.GetMask ("BoardPlane"))) 
+		{
 			selectionX = (int)hit.point.x;
 			selectionY = (int)hit.point.z;
 		} 

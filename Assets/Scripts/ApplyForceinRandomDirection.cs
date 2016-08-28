@@ -7,17 +7,24 @@ public class ApplyForceinRandomDirection : MonoBehaviour
 	public float forceAmount=35.0f;
 	public float torque=50.0f;
 	public string buttonName = "Fire1";
+	public int rollCount=0;
 	public Rigidbody rb; // rigid body comment
  
 	
 	// Update is called once per frame
-	void Update () 
+	public void Update () 
 	{
-	  if (Input.GetButtonDown (buttonName)) 
+	  if (Input.GetKeyDown(KeyCode.Z)) 
 		{
-			rb.GetComponent<Rigidbody>();
-			rb.AddForce(Random.onUnitSphere*forceAmount,forceMode);
-			rb.AddTorque(Random.onUnitSphere*torque,forceMode);
+			Roll();
 		}
+	}
+
+	public void Roll()
+	{
+		rollCount=rollCount+1;
+		rb.GetComponent<Rigidbody>();
+		rb.AddForce(Random.onUnitSphere*forceAmount,forceMode);
+		rb.AddTorque(Random.onUnitSphere*torque,forceMode);
 	}
 }
