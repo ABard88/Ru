@@ -107,7 +107,7 @@ public class Pieces : Pawns
 
 			Debug.Log(xSpot+","+ySpot);
 			P1=BoardManager.Instance.Pawns[xSpot,ySpot];
-			if(P1==null || (!P1.isWhite && P1.CurrentX!=3 && P1.CurrentY!=1)||(!P1.isWhite && P1.CurrentX!=7 && P1.CurrentY!=1))
+			if(P1==null || (!P1.isWhite && P1.CurrentX!=3 && P1.CurrentY==1)||(!P1.isWhite && P1.CurrentX!=7 && P1.CurrentY==1))
 				r[xSpot,ySpot]=true;
 		}
 		else 
