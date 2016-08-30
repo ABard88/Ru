@@ -1,14 +1,25 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class BoardManager : MonoBehaviour 
 {
 	public static BoardManager Instance{ set; get;}
 	private bool[,] allowedMoves{ set; get;}
 
+	public Camera mainCam;
+	public Camera diceCam;
+
+	public Text UITurn;
+	public Text UIScoreP1;
+	public Text UIScoreP2;
+	
 	public Pawns[,] Pawns{ set; get;}
+
+	public GameObject[] blacks;
 	private Pawns selectedPawn;
+	public GameObject dice;
 	private const float TILE_SIZE=1.0f;
 	private const float TILE_OFFSET=0.5f;
 
@@ -65,13 +76,43 @@ public class BoardManager : MonoBehaviour
 	{
 		Instance = this;
 		SpawnAllPieces ();
+		mainCam.enabled = true;
+		diceCam.enabled = false;
 	}
-		
+
 	private void Update()
 	{
+		string whoseTurn;
+		//Display Game states.
+		if (isWhiteTurn) 
+		{
+			 whoseTurn = "Whites' Move";
+		}
+		else 
+		{
+			 whoseTurn = "Reds' Move";
+		}
+		UIScoreP1.text = "Whites Score:" + scoreP1.ToString ();
+		UIScoreP2.text = "Reds Score:" + scoreP2.ToString ();
+		UITurn.text = whoseTurn.ToString ();
 		UpdateSelection ();
 		DrawBoard ();
-		zeroCounter = Dice.GetComponent<DisplayCurrentDieValue> ().currentValue;
+
+		//Switch cams
+		if (Input.GetKeyUp(KeyCode.Z)) 
+		{
+			mainCam.enabled = !mainCam.enabled;
+			diceCam.enabled = !diceCam.enabled;
+		}
+		if (Input.GetKeyUp(KeyCode.Space)) 
+		{
+			mainCam.enabled = !mainCam.enabled;
+			diceCam.enabled = !diceCam.enabled;
+		}
+
+
+
+		// Check winning conditions.
 		if (scoreP1 == 4) 
 		{
 			whiteWin.transform.localPosition=new Vector3(5,2,0);
@@ -81,7 +122,23 @@ public class BoardManager : MonoBehaviour
 			blacWin.transform.localPosition=new Vector3(5,2,0);
 		}
 
-
+/*		if (!isWhiteTurn) 
+		{
+			blacks= GameObject.FindGameObjectsWithTag("Black");
+			int[] pieceCounterX= new int[4];
+			int[] pieceCounterY=new int[4];
+			int i=0;
+			// insert foreach in a for loop where i= no. of pawns. check Gwent3PolCamp4
+				foreach(GameObject Black in blacks)
+				{
+					pieceCounterX[i]= Black.GetComponent<Pieces>().CurrentX;
+					//pieceCounterY[i]=Black.GetComponent<Pieces>().CurrentY;
+					i++;
+				}
+			//SelectedPawn(pieceCounterX[0], pieceCounterY[0]);
+			//MovePawn(pieceCounterX[0], pieceCounterY[0]);
+		}
+*/
 		if (Input.GetMouseButtonDown (0)) 
 		{
 			if(selectionX>=0 && selectionY>=0)
@@ -106,10 +163,15 @@ public class BoardManager : MonoBehaviour
 		{
 			return;
 		}
-/*		if (zeroCounter == 0) // If a Zero is rolled switch turns.
+		zeroCounter = dice.GetComponent<DisplayCurrentDieValue> ().currentValue;
+		// If you roll a zero then no movement possible therefore switch sides
+		if (zeroCounter == 0) 
 		{
-			isWhiteTurn= !isWhiteTurn;
-		}*/
+			Debug.Log("Whose turn?");
+			isWhiteTurn=!isWhiteTurn;
+		}
+		Debug.Log (zeroCounter);
+
 		if (Pawns [x, y].isWhite != isWhiteTurn) 
 		{
 			return;
@@ -117,7 +179,7 @@ public class BoardManager : MonoBehaviour
 
 		bool canMove = false;
 		allowedMoves = Pawns [x, y].PossibleMove ();
-		for (int i=0; i<9; i++)
+		for (int i=0; i<=9; i++)
 			for (int j=0; j<3; j++)
 				if (allowedMoves [i, j]) 
 				{
@@ -140,18 +202,32 @@ public class BoardManager : MonoBehaviour
 		if (allowedMoves[x,y]) 
 		{
 			Pawns P1= Pawns[x,y];
-
 			if(P1!=null && P1.isWhite!=isWhiteTurn)
 			{
-				//Capture Pawn
+				//Capture Pawn and respawn at an empty space
 				activePawn.Remove(P1.gameObject);
+				bool replaced=false;
 				if(P1.isWhite)
 				{
-					SpawnPawn(0,7,0);
+					for(int i=3; i<7;i++)
+					{
+						if(Pawns[i,0]==null && replaced==false)
+						{
+							SpawnPawn(0,i,0);
+							replaced=true;
+						}
+					}
 				}
 				else
 				{
-					SpawnPawn(1,7,2);
+					for(int i=3; i<7;i++)
+					{
+						if(Pawns[i,2]==null && replaced==false)
+						{
+							SpawnPawn(1,i,2);
+							replaced=true;
+						}
+					}
 				}
 				Destroy(P1.gameObject);
 

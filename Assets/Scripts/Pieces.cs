@@ -12,13 +12,10 @@ public class Pieces : Pawns
 	public override bool[,] PossibleMove()
 	{
 		bool[,] r = new bool[10, 3];
-		Pawns P1, P2;
+		Pawns P1;
 		Dice=GameObject.FindGameObjectWithTag("Dice");
 		bool rollOn=true;
 		bool turn;
-		int fO2, fO3; //fortress Occupied
-		fO2 = BoardManager.fortOccupied [2];
-		fO3 = BoardManager.fortOccupied [3];
 
 		//White Moves
 		if (isWhite)
@@ -30,7 +27,7 @@ public class Pieces : Pawns
 			}
 			turn=BoardManager.isWhiteTurn;
 			decreementDieValue=step;
-			if(decreementDieValue==0){turn=!turn; BoardManager.isWhiteTurn=turn;}
+			if(decreementDieValue==0){BoardManager.isWhiteTurn=false;}
 			if(decreementDieValue<0)
 			{
 				decreementDieValue=1;
@@ -69,6 +66,7 @@ public class Pieces : Pawns
 					if(retreat==true)
 					{
 						ySpot=ySpot-1;
+						xSpot=xSpot-1;
 						retreat=false;
 					}
 				}
@@ -107,8 +105,19 @@ public class Pieces : Pawns
 
 			Debug.Log(xSpot+","+ySpot);
 			P1=BoardManager.Instance.Pawns[xSpot,ySpot];
-			if(P1==null || (!P1.isWhite && P1.CurrentX!=3 && P1.CurrentY==1)||(!P1.isWhite && P1.CurrentX!=7 && P1.CurrentY==1))
+			if(P1==null)
 				r[xSpot,ySpot]=true;
+			else
+			{
+				bool v1,v2;
+				v1 = ((P1.isWhite==false) && (P1.CurrentX!=3) && (P1.CurrentY==1));
+				v2 = ((P1.isWhite==false) && (P1.CurrentX!=7) && (P1.CurrentY==1));
+				if( v1 && v2 )
+				{
+					r[xSpot,ySpot]=true;
+				}
+			}
+
 		}
 		else 
 		{
@@ -145,13 +154,18 @@ public class Pieces : Pawns
 						retreat=false;
 					}
 				}
+
 				while((xSpotP2<9) && (ySpotP2==1) && (decreementDieValue>0))
 				{
 					xSpotP2=xSpotP2+1;
 					decreementDieValue=decreementDieValue-1;
 					if(retreat==true)
 					{
-						xSpotP2=xSpotP2-2;
+						xSpotP2=xSpotP2-1;
+						if(xSpot==0)
+						{
+							ySpot=ySpot+1;
+						}
 						retreat=false;
 					}
 				}
@@ -186,10 +200,10 @@ public class Pieces : Pawns
 			}
 			else
 			{
-				bool v1,v2,v3;
-				v1 = (P1.isWhite && P1.CurrentX!=3 && P1.CurrentY==1);
-				v2 = (P1.isWhite && P1.CurrentX!=7 && P1.CurrentY==1);
-				if( v1 || v2 )
+				bool v1,v2;
+				v1 = ((P1.isWhite) && (P1.CurrentX!=3) && (P1.CurrentY==1));
+				v2 = ((P1.isWhite) && (P1.CurrentX!=7) && (P1.CurrentY==1));
+				if( v1 && v2 )
 				{
 					r[xSpotP2,ySpotP2]=true;
 				}

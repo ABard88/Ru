@@ -8,6 +8,7 @@ public class DisplayCurrentDieValue : MonoBehaviour
 	public int rollVal=2;
 	public bool rollComplete=false;
 	Rigidbody rb;
+	public GUISkin guiSkin;
 	
 	void Update () 
 	{
@@ -21,15 +22,18 @@ public class DisplayCurrentDieValue : MonoBehaviour
 			}
 		}
 		rb = GetComponent<ApplyForceinRandomDirection> ().rb;
-		if (rb.IsSleeping ()) {
+		if (rb.IsSleeping ()) 
+		{
 			rollComplete = true;
-		} else
+		} 
+		else
 			rollComplete = false;
 
 	}
 
 	void OnGUI()
 	{
-		GUILayout.Label (currentValue.ToString());
+		GUI.skin = guiSkin;
+		GUILayout.Label ("Dice Roll="+currentValue.ToString());
 	}
 }
