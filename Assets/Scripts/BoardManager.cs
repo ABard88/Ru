@@ -80,6 +80,92 @@ public class BoardManager : MonoBehaviour
 		diceCam.enabled = false;
 	}
 
+	public void SwitchCam()
+	{
+		mainCam.enabled = !mainCam.enabled;
+		diceCam.enabled = !diceCam.enabled;
+	}
+
+	IEnumerator Autoplay(float waitTime)
+	{
+		SwitchCam();
+		//yield return new WaitForSeconds (waitTime);
+//		Dice.GetComponent<ApplyForceinRandomDirection>().Roll();
+		blacks= GameObject.FindGameObjectsWithTag("Black");
+		int[] pieceCounterX= new int[4];
+		int[] pieceCounterY=new int[4];
+		int i=0;
+		// insert foreach in a for loop where i= no. of pawns. check Gwent3PolCamp4
+		foreach(GameObject Black in blacks)
+		{
+			pieceCounterX[i]= Black.GetComponent<Pieces>().CurrentX; //This tells current xspot of selected pawn
+			pieceCounterY[i]=Black.GetComponent<Pieces>().CurrentY; //This tells current yspot of selected pawn
+			i++;
+		}
+
+		// Write down code for SelectedPawn function
+		bool canMove = false;
+		allowedMoves = Pawns [pieceCounterX[0], pieceCounterY[0]].PossibleMove ();
+		for (int a=0; a<=9; a++)
+			for (int b=0; b<3; b++)
+				if (allowedMoves [a,b]) 
+			{
+				canMove = true; 
+				Debug.Log("Can Move");
+			}
+
+		selectedPawn = Pawns [pieceCounterX[0], pieceCounterY[0]];
+		BoardHighlights.Instance.HighlightAllowedMoves (allowedMoves);
+
+		//Write down code for MovePawn function [Re written]
+		int d = Pieces.xSpotP2; // These two numbers have to be equal to the bool value that is 
+		int e = Pieces.ySpotP2; // spit out by the Possible Move function in Pieces
+		if (allowedMoves [d, e]) {
+			Pawns P1 = Pawns [d, e];
+			if (P1 != null && P1.isWhite != isWhiteTurn) 
+			{
+				//Capture Pawn and respawn at an empty space
+				activePawn.Remove (P1.gameObject);
+				bool replaced = false;
+				if (P1.isWhite) 
+				{
+					for (int c=3; c<7; c++) 
+					{
+						if (Pawns [c, 0] == null && replaced == false)
+						{
+							SpawnPawn (0, c, 0);
+							replaced = true;
+						}
+					}
+				}
+
+				Destroy (P1.gameObject);				
+			}
+		}	
+		Pawns[selectedPawn.CurrentX,selectedPawn.CurrentY]=null;
+		selectedPawn.transform.position= GetTile(d,e);
+		selectedPawn.SetPosition(d,e);
+		Pawns[d,e]=selectedPawn;
+		moveCounter=moveCounter+1;
+		isWhiteTurn=!isWhiteTurn;
+		Debug.Log(isWhiteTurn);
+		Debug.Log("Blacks="+selectedPawn.CurrentX+","+selectedPawn.CurrentY);
+		if(selectedPawn.CurrentX==8 && selectedPawn.CurrentY==2)
+		{
+			scoreP2=scoreP2+1;
+			Destroy(selectedPawn.gameObject);
+		}			
+			//If landing on fortress dont change turn else change turn
+		if((selectedPawn.CurrentX==3 && selectedPawn.CurrentY==1)||(selectedPawn.CurrentX==7 && selectedPawn.CurrentY==1)||(selectedPawn.CurrentX==0 && selectedPawn.CurrentY==0)||(selectedPawn.CurrentX==0 && selectedPawn.CurrentY==2) ||(selectedPawn.CurrentX==8 && selectedPawn.CurrentY==0)||(selectedPawn.CurrentX==8 && selectedPawn.CurrentY==2))
+		{
+			isWhiteTurn=!isWhiteTurn;
+		}
+		BoardHighlights.Instance.HideHighlights ();
+		selectedPawn = null;
+		yield break;
+	}
+	
+
 	private void Update()
 	{
 		string whoseTurn;
@@ -92,6 +178,7 @@ public class BoardManager : MonoBehaviour
 		{
 			 whoseTurn = "Reds' Move";
 		}
+
 		UIScoreP1.text = "Whites Score:" + scoreP1.ToString ();
 		UIScoreP2.text = "Reds Score:" + scoreP2.ToString ();
 		UITurn.text = whoseTurn.ToString ();
@@ -101,16 +188,12 @@ public class BoardManager : MonoBehaviour
 		//Switch cams
 		if (Input.GetKeyUp(KeyCode.Z)) 
 		{
-			mainCam.enabled = !mainCam.enabled;
-			diceCam.enabled = !diceCam.enabled;
+			SwitchCam();
 		}
 		if (Input.GetKeyUp(KeyCode.Space)) 
 		{
-			mainCam.enabled = !mainCam.enabled;
-			diceCam.enabled = !diceCam.enabled;
+			SwitchCam();
 		}
-
-
 
 		// Check winning conditions.
 		if (scoreP1 == 4) 
@@ -121,24 +204,12 @@ public class BoardManager : MonoBehaviour
 		{
 			blacWin.transform.localPosition=new Vector3(5,2,0);
 		}
-
-/*		if (!isWhiteTurn) 
+		// Calling computers turn
+ 		if(!isWhiteTurn) 
 		{
-			blacks= GameObject.FindGameObjectsWithTag("Black");
-			int[] pieceCounterX= new int[4];
-			int[] pieceCounterY=new int[4];
-			int i=0;
-			// insert foreach in a for loop where i= no. of pawns. check Gwent3PolCamp4
-				foreach(GameObject Black in blacks)
-				{
-					pieceCounterX[i]= Black.GetComponent<Pieces>().CurrentX;
-					//pieceCounterY[i]=Black.GetComponent<Pieces>().CurrentY;
-					i++;
-				}
-			//SelectedPawn(pieceCounterX[0], pieceCounterY[0]);
-			//MovePawn(pieceCounterX[0], pieceCounterY[0]);
+			StartCoroutine (Autoplay(1.0f));
 		}
-*/
+
 		if (Input.GetMouseButtonDown (0)) 
 		{
 			if(selectionX>=0 && selectionY>=0)
@@ -167,10 +238,8 @@ public class BoardManager : MonoBehaviour
 		// If you roll a zero then no movement possible therefore switch sides
 		if (zeroCounter == 0) 
 		{
-			Debug.Log("Whose turn?");
 			isWhiteTurn=!isWhiteTurn;
 		}
-		Debug.Log (zeroCounter);
 
 		if (Pawns [x, y].isWhite != isWhiteTurn) 
 		{
@@ -185,8 +254,7 @@ public class BoardManager : MonoBehaviour
 				{
 					canMove = true; 
 					Debug.Log("Can Move");
-				}
-					
+				}					
 		if (!canMove) 
 		{
 			Debug.Log("Can't Move");
@@ -194,7 +262,6 @@ public class BoardManager : MonoBehaviour
 		}
 		selectedPawn = Pawns [x, y];
 		BoardHighlights.Instance.HighlightAllowedMoves (allowedMoves);
-
 	}
 
 	private void MovePawn(int x, int y)

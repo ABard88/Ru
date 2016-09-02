@@ -6,7 +6,7 @@ public class Pieces : Pawns
 {
 	public GameObject Dice;
 	public int step;
-	public int decreementDieValue, xSpot,ySpot, xSpotP2, ySpotP2;
+	public static int decreementDieValue, xSpot,ySpot, xSpotP2, ySpotP2;
 	bool retreat=false;
 
 	public override bool[,] PossibleMove()
@@ -142,6 +142,10 @@ public class Pieces : Pawns
 						xSpotP2=xSpotP2+2;
 						retreat=false;
 					}
+					if(xSpotP2==9)
+					{
+						xSpotP2=xSpotP2+1;
+					}
 				}
 				while((xSpotP2==0) && (ySpotP2==2) && (decreementDieValue>0))
 				{
@@ -161,7 +165,7 @@ public class Pieces : Pawns
 					decreementDieValue=decreementDieValue-1;
 					if(retreat==true)
 					{
-						xSpotP2=xSpotP2-1;
+						xSpotP2=xSpotP2-2;
 						if(xSpot==0)
 						{
 							ySpot=ySpot+1;
