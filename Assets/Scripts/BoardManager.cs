@@ -89,7 +89,6 @@ public class BoardManager : MonoBehaviour
 	IEnumerator Autoplay(float waitTime)
 	{
 		SwitchCam();
-		//yield return new WaitForSeconds (waitTime);
 //		Dice.GetComponent<ApplyForceinRandomDirection>().Roll();
 		blacks= GameObject.FindGameObjectsWithTag("Black");
 		int[] pieceCounterX= new int[4];
@@ -105,18 +104,34 @@ public class BoardManager : MonoBehaviour
 
 		// Write down code for SelectedPawn function
 		bool canMove = false;
-		allowedMoves = Pawns [pieceCounterX[0], pieceCounterY[0]].PossibleMove ();
-		for (int a=0; a<=9; a++)
-			for (int b=0; b<3; b++)
-				if (allowedMoves [a,b]) 
+		int countPawn = 0;
+		bool canKill = false;
+		bool onFort = false;
+		while (countPawn<4 && canKill==false && onFort==false) 
+		{
+			allowedMoves = Pawns [pieceCounterX [countPawn], pieceCounterY [countPawn]].PossibleMove ();
+			for (int a=0; a<=9; a++)
+				for (int b=0; b<3; b++)
+					if (allowedMoves [a, b]) 
+					{
+						canMove = Pieces.canMove; // Find a way to use can move to check and move the pawn
+						canKill = Pieces.Kill;
+						onFort= Pieces.Fort;
+						Debug.Log ("Can Move");
+					}
+			if(canMove==true)
 			{
-				canMove = true; 
-				Debug.Log("Can Move");
+				selectedPawn = Pawns [pieceCounterX [countPawn], pieceCounterY [countPawn]];
+				BoardHighlights.Instance.HighlightAllowedMoves (allowedMoves);
 			}
-
-		selectedPawn = Pawns [pieceCounterX[0], pieceCounterY[0]];
-		BoardHighlights.Instance.HighlightAllowedMoves (allowedMoves);
-
+			countPawn++;
+		}
+		if (canKill == false && onFort == false && countPawn == 4) 
+		{
+			int pawnCounter=0;
+			selectedPawn = Pawns [pieceCounterX [pawnCounter], pieceCounterY [pawnCounter]]; //[0] This makes the 1st pawn move
+			allowedMoves = Pawns [pieceCounterX [pawnCounter], pieceCounterY [pawnCounter]].PossibleMove (); // write better logic to make the furthest one move.
+		}
 		//Write down code for MovePawn function [Re written]
 		int d = Pieces.xSpotP2; // These two numbers have to be equal to the bool value that is 
 		int e = Pieces.ySpotP2; // spit out by the Possible Move function in Pieces
@@ -147,19 +162,18 @@ public class BoardManager : MonoBehaviour
 		selectedPawn.SetPosition(d,e);
 		Pawns[d,e]=selectedPawn;
 		moveCounter=moveCounter+1;
-		isWhiteTurn=!isWhiteTurn;
-		Debug.Log(isWhiteTurn);
 		Debug.Log("Blacks="+selectedPawn.CurrentX+","+selectedPawn.CurrentY);
 		if(selectedPawn.CurrentX==8 && selectedPawn.CurrentY==2)
 		{
 			scoreP2=scoreP2+1;
 			Destroy(selectedPawn.gameObject);
 		}			
-			//If landing on fortress dont change turn else change turn
-		if((selectedPawn.CurrentX==3 && selectedPawn.CurrentY==1)||(selectedPawn.CurrentX==7 && selectedPawn.CurrentY==1)||(selectedPawn.CurrentX==0 && selectedPawn.CurrentY==0)||(selectedPawn.CurrentX==0 && selectedPawn.CurrentY==2) ||(selectedPawn.CurrentX==8 && selectedPawn.CurrentY==0)||(selectedPawn.CurrentX==8 && selectedPawn.CurrentY==2))
-		{
-			isWhiteTurn=!isWhiteTurn;
-		}
+		if ((selectedPawn.CurrentX == 3 && selectedPawn.CurrentY == 1) || (selectedPawn.CurrentX == 7 && selectedPawn.CurrentY == 1) || (selectedPawn.CurrentX == 0 && selectedPawn.CurrentY == 2) || (selectedPawn.CurrentX == 8 && selectedPawn.CurrentY == 2)) {
+			isWhiteTurn = false;
+		} 
+		else
+			isWhiteTurn = !isWhiteTurn;
+
 		BoardHighlights.Instance.HideHighlights ();
 		selectedPawn = null;
 		yield break;
@@ -178,7 +192,6 @@ public class BoardManager : MonoBehaviour
 		{
 			 whoseTurn = "Reds' Move";
 		}
-
 		UIScoreP1.text = "Whites Score:" + scoreP1.ToString ();
 		UIScoreP2.text = "Reds Score:" + scoreP2.ToString ();
 		UITurn.text = whoseTurn.ToString ();
@@ -311,12 +324,7 @@ public class BoardManager : MonoBehaviour
 				Debug.Log("Score="+scoreP1);
 				Destroy(selectedPawn.gameObject);
 			}
-			if(selectedPawn.CurrentX==8 && selectedPawn.CurrentY==2)
-			{
-				scoreP2=scoreP2+1;
-				Debug.Log("Score="+scoreP2);
-				Destroy(selectedPawn.gameObject);
-			}
+
 
 //If landing on fortress dont change turn else change turn
 			if((selectedPawn.CurrentX==3 && selectedPawn.CurrentY==1)||(selectedPawn.CurrentX==7 && selectedPawn.CurrentY==1)||(selectedPawn.CurrentX==0 && selectedPawn.CurrentY==0)||(selectedPawn.CurrentX==0 && selectedPawn.CurrentY==2) ||(selectedPawn.CurrentX==8 && selectedPawn.CurrentY==0)||(selectedPawn.CurrentX==8 && selectedPawn.CurrentY==2))

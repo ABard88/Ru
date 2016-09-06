@@ -34,6 +34,6 @@ public class DisplayCurrentDieValue : MonoBehaviour
 	void OnGUI()
 	{
 		GUI.skin = guiSkin;
-		GUILayout.Label ("Dice Roll="+currentValue.ToString());
+		GUILayout.Label ("Dice Roll = "+currentValue.ToString());
 	}
 }

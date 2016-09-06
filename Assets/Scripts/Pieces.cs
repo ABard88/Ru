@@ -8,6 +8,7 @@ public class Pieces : Pawns
 	public int step;
 	public static int decreementDieValue, xSpot,ySpot, xSpotP2, ySpotP2;
 	bool retreat=false;
+	public static bool Kill=false, Fort =false, canMove=false;
 
 	public override bool[,] PossibleMove()
 	{
@@ -16,7 +17,9 @@ public class Pieces : Pawns
 		Dice=GameObject.FindGameObjectWithTag("Dice");
 		bool rollOn=true;
 		bool turn;
-
+		Fort = false;
+		Kill = false;
+		canMove = false;
 		//White Moves
 		if (isWhite)
 		{
@@ -105,8 +108,15 @@ public class Pieces : Pawns
 
 			Debug.Log(xSpot+","+ySpot);
 			P1=BoardManager.Instance.Pawns[xSpot,ySpot];
+
 			if(P1==null)
+			{
 				r[xSpot,ySpot]=true;
+				if(xSpot==7 && ySpot==0)
+				{
+					r[xSpot,ySpot]=false;
+				}
+			}
 			else
 			{
 				bool v1,v2;
@@ -200,8 +210,20 @@ public class Pieces : Pawns
 			P1=BoardManager.Instance.Pawns[xSpotP2,ySpotP2];
 			if( P1==null)
 			{
+				canMove=true;
 				r[xSpotP2,ySpotP2]=true;
+				if(xSpotP2==7 && ySpotP2==2)
+				{
+					canMove=false;
+					r[xSpotP2,ySpotP2]=false;
+				}
+				if((xSpotP2==3 && ySpotP2==1)||(xSpotP2==7 && ySpotP2==1)||(xSpotP2==0 && ySpotP2==2)||(xSpotP2==8 && ySpotP2==2))
+				{
+					Fort=true;
+					canMove=true;
+				}
 			}
+			// Introduce a condition where if y=2 and x<8 don't move.
 			else
 			{
 				bool v1,v2;
@@ -209,6 +231,8 @@ public class Pieces : Pawns
 				v2 = ((P1.isWhite) && (P1.CurrentX!=7) && (P1.CurrentY==1));
 				if( v1 && v2 )
 				{
+					canMove=true;
+					Kill=true;
 					r[xSpotP2,ySpotP2]=true;
 				}
 			}

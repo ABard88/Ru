@@ -8,8 +8,10 @@ public class BoardHighlights : MonoBehaviour
 	public static BoardHighlights Instance{ set; get;}
 	public GameObject highlightPrefab;
 	public GameObject fortressPrefab;
+	public GameObject highlightkhadan;
 	private List<GameObject> highlights;
 	private List<GameObject> fortresses;
+	private List<GameObject> khadan;
 
 
 	private void Start()
@@ -17,7 +19,9 @@ public class BoardHighlights : MonoBehaviour
 		Instance = this;
 		highlights = new List<GameObject> ();
 		fortresses = new List<GameObject> ();
+		khadan = new List<GameObject> ();
 		HighlightFortress ();
+		Khadan ();
 
 	}
 
@@ -66,6 +70,25 @@ public class BoardHighlights : MonoBehaviour
 			}
 		}
 
+	}
+
+	public void Khadan()
+	{
+		GameObject ko = highlights.Find (g => !g.activeSelf);
+		for(int i=0; i<10;i++)
+		{
+			for(int j=0;j<3;j++)
+			{
+				if((i==7 && j==0) || (i==7 && j==2))
+				{
+					ko = Instantiate(highlightkhadan);
+					ko.SetActive(true);
+					khadan.Add(ko);
+					ko.transform.position=new Vector3(i+0.5f,0,j+0.5f);
+				}
+				
+			}
+		}
 	}
 
 	public void HideHighlights()
