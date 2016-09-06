@@ -25,7 +25,7 @@ public class BoardHighlights : MonoBehaviour
 
 	}
 
-	private GameObject GetHighlightObject()
+	private GameObject GetHighlightObject() 
 	{
 		GameObject go = highlights.Find (g => !g.activeSelf);
 		if (go == null) 
@@ -36,7 +36,7 @@ public class BoardHighlights : MonoBehaviour
 		return go;
 	}
 
-	public void HighlightAllowedMoves(bool[,] moves)
+	public void HighlightAllowedMoves(bool[,] moves) // Highlights for possible moves.
 	{
 		for (int i=0; i<10; i++) 
 		{
@@ -52,14 +52,14 @@ public class BoardHighlights : MonoBehaviour
 		}
 	}
 
-	public void HighlightFortress()
+	public void HighlightFortress() // This highlights the fortresses and is always on as it's called at the start.
 	{
 		GameObject fo = highlights.Find (g => !g.activeSelf);
 		for(int i=0; i<10;i++)
 		{
 			for(int j=0;j<3;j++)
 			{
-				if((i==0 && j==0) || (i==3 && j==1)|| (i==7 && j==1) || (i==8 && j==0) || (i==0 && j==2)|| (i==8 && j==2))
+				if((i==0 && j==0) || (i==3 && j==1)|| (i==7 && j==1) || (i==8 && j==0) || (i==0 && j==2)|| (i==8 && j==2)) //Fortress coordinates
 				{
 					fo = Instantiate(fortressPrefab);
 					fo.SetActive(true);
@@ -72,7 +72,7 @@ public class BoardHighlights : MonoBehaviour
 
 	}
 
-	public void Khadan()
+	public void Khadan()// Black space for inaccessible square also called at the start so always on.
 	{
 		GameObject ko = highlights.Find (g => !g.activeSelf);
 		for(int i=0; i<10;i++)

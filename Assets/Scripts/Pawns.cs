@@ -15,7 +15,7 @@ public class Pawns : MonoBehaviour
 
 	public virtual 	bool[,] PossibleMove()
 	{
-		return new bool[10,3];
+		return new bool[10,3]; // returns true or false for each square in the 10x3 grid. If true then you can move.
 	}
 
 

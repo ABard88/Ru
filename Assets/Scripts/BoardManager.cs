@@ -29,6 +29,7 @@ public class BoardManager : MonoBehaviour
 	public int scoreP1=0;
 	public int scoreP2 = 0;
 	public int moveCounter=1;
+	public int redTeam=4;
 	public static int[] fortOccupied = new int[6];
 
 	public static bool isWhiteTurn=true;
@@ -107,7 +108,7 @@ public class BoardManager : MonoBehaviour
 		int countPawn = 0;
 		bool canKill = false;
 		bool onFort = false;
-		while (countPawn<4 && canKill==false && onFort==false) 
+		while (countPawn< redTeam && canKill==false && onFort==false) 
 		{
 			allowedMoves = Pawns [pieceCounterX [countPawn], pieceCounterY [countPawn]].PossibleMove ();
 			for (int a=0; a<=9; a++)
@@ -126,16 +127,26 @@ public class BoardManager : MonoBehaviour
 			}
 			countPawn++;
 		}
+		int pawnCounter=0;
 		if (canKill == false && onFort == false && countPawn == 4) 
 		{
-			int pawnCounter=0;
 			selectedPawn = Pawns [pieceCounterX [pawnCounter], pieceCounterY [pawnCounter]]; //[0] This makes the 1st pawn move
 			allowedMoves = Pawns [pieceCounterX [pawnCounter], pieceCounterY [pawnCounter]].PossibleMove (); // write better logic to make the furthest one move.
+			int tempD=Pieces.xSpotP2;
+			int tempE=Pieces.ySpotP2;
+			if(tempD==7 && tempE==2) // Condition added so as not to move the pawn on to square 7,2
+			{
+				pawnCounter++;
+				selectedPawn = Pawns [pieceCounterX [pawnCounter], pieceCounterY [pawnCounter]];
+				allowedMoves = Pawns [pieceCounterX [pawnCounter], pieceCounterY [pawnCounter]].PossibleMove ();
+			}
+		
 		}
 		//Write down code for MovePawn function [Re written]
 		int d = Pieces.xSpotP2; // These two numbers have to be equal to the bool value that is 
 		int e = Pieces.ySpotP2; // spit out by the Possible Move function in Pieces
-		if (allowedMoves [d, e]) {
+		if (allowedMoves [d, e]) 
+		{
 			Pawns P1 = Pawns [d, e];
 			if (P1 != null && P1.isWhite != isWhiteTurn) 
 			{
@@ -167,6 +178,7 @@ public class BoardManager : MonoBehaviour
 		{
 			scoreP2=scoreP2+1;
 			Destroy(selectedPawn.gameObject);
+			redTeam--;
 		}			
 		if ((selectedPawn.CurrentX == 3 && selectedPawn.CurrentY == 1) || (selectedPawn.CurrentX == 7 && selectedPawn.CurrentY == 1) || (selectedPawn.CurrentX == 0 && selectedPawn.CurrentY == 2) || (selectedPawn.CurrentX == 8 && selectedPawn.CurrentY == 2)) {
 			isWhiteTurn = false;
@@ -223,7 +235,7 @@ public class BoardManager : MonoBehaviour
 			StartCoroutine (Autoplay(1.0f));
 		}
 
-		if (Input.GetMouseButtonDown (0)) 
+		if (Input.GetMouseButtonDown (0)) // Input for selecting pawn
 		{
 			if(selectionX>=0 && selectionY>=0)
 			{
@@ -241,7 +253,7 @@ public class BoardManager : MonoBehaviour
 		}
 	}
 
-	private void SelectedPawn(int x, int y)
+	private void SelectedPawn(int x, int y) // function to select pawn
 	{
 		if (Pawns [x, y] == null) 
 		{
@@ -260,7 +272,7 @@ public class BoardManager : MonoBehaviour
 		}
 
 		bool canMove = false;
-		allowedMoves = Pawns [x, y].PossibleMove ();
+		allowedMoves = Pawns [x, y].PossibleMove (); // checks for allowed moves of the selected pawn;
 		for (int i=0; i<=9; i++)
 			for (int j=0; j<3; j++)
 				if (allowedMoves [i, j]) 
@@ -274,10 +286,10 @@ public class BoardManager : MonoBehaviour
 			return;
 		}
 		selectedPawn = Pawns [x, y];
-		BoardHighlights.Instance.HighlightAllowedMoves (allowedMoves);
+		BoardHighlights.Instance.HighlightAllowedMoves (allowedMoves); // highlights where the pawn will move to
 	}
 
-	private void MovePawn(int x, int y)
+	private void MovePawn(int x, int y) // Function to move pawn
 	{
 		if (allowedMoves[x,y]) 
 		{
@@ -312,13 +324,13 @@ public class BoardManager : MonoBehaviour
 				Destroy(P1.gameObject);
 
 			}
-			
+			// moves pawns.
 			Pawns[selectedPawn.CurrentX,selectedPawn.CurrentY]=null;
 			selectedPawn.transform.position= GetTile(x,y);
 			selectedPawn.SetPosition(x,y);
 			Pawns[x,y]=selectedPawn;
 			moveCounter=moveCounter+1;
-			if(selectedPawn.CurrentX==8 && selectedPawn.CurrentY==0)
+			if(selectedPawn.CurrentX==8 && selectedPawn.CurrentY==0) // Updates score when pawn lands on final square
 			{
 				scoreP1=scoreP1+1;
 				Debug.Log("Score="+scoreP1);
@@ -339,7 +351,7 @@ public class BoardManager : MonoBehaviour
 
 	}
 
-	private void UpdateSelection()
+	private void UpdateSelection() // Identifies the pawn selected.
 	{
 		if (!Camera.main)
 			return;
@@ -355,7 +367,7 @@ public class BoardManager : MonoBehaviour
 			selectionY = -1;
 		}
 	}
-	private void DrawBoard()
+	private void DrawBoard() // Draws a coordinate grid which helps in identifying locations of pieces.
 	{
 		Vector3 widthLine = Vector3.right * 10;
 		Vector3 heightLine = Vector3.forward * 3;

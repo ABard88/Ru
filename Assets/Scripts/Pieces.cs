@@ -4,14 +4,15 @@ using System.Collections;
 public class Pieces : Pawns 
 
 {
-	public GameObject Dice;
-	public int step;
-	public static int decreementDieValue, xSpot,ySpot, xSpotP2, ySpotP2;
-	bool retreat=false;
-	public static bool Kill=false, Fort =false, canMove=false;
+	public GameObject Dice; //Uses values from the dice.
+	public int step; // used as a countdown from the dice value to finish playing appropriate no of steps
+	public static int decreementDieValue, xSpot,ySpot, xSpotP2, ySpotP2; // ints for identifying final move coordinates
+	bool retreat=false; // used when you've rolled -1 
+	public static bool Kill=false, Fort =false, canMove=false; // activated when computer can kill or land on fortress helps in computer decision
 
 	public override bool[,] PossibleMove()
 	{
+		// initialize variables
 		bool[,] r = new bool[10, 3];
 		Pawns P1;
 		Dice=GameObject.FindGameObjectWithTag("Dice");
@@ -36,9 +37,10 @@ public class Pieces : Pawns
 				decreementDieValue=1;
 				retreat=true;
 			}
-
+			// gets current position of the pawn
 			xSpot=CurrentX;
 			ySpot=CurrentY;
+			// shadow moves on the grid according to the path laid out
 			while(decreementDieValue!=0)
 			{
 				while((xSpot>0) && (ySpot<1) && (decreementDieValue>0))
@@ -107,9 +109,9 @@ public class Pieces : Pawns
 			}
 
 			Debug.Log(xSpot+","+ySpot);
-			P1=BoardManager.Instance.Pawns[xSpot,ySpot];
+			P1=BoardManager.Instance.Pawns[xSpot,ySpot]; // Selects the final resting squre in the shadow move
 
-			if(P1==null)
+			if(P1==null) // checks if the square is empty
 			{
 				r[xSpot,ySpot]=true;
 				if(xSpot==7 && ySpot==0)
@@ -117,19 +119,19 @@ public class Pieces : Pawns
 					r[xSpot,ySpot]=false;
 				}
 			}
-			else
+			else // if square is not empty
 			{
 				bool v1,v2;
-				v1 = ((P1.isWhite==false) && (P1.CurrentX!=3) && (P1.CurrentY==1));
+				v1 = ((P1.isWhite==false) && (P1.CurrentX!=3) && (P1.CurrentY==1)); 
 				v2 = ((P1.isWhite==false) && (P1.CurrentX!=7) && (P1.CurrentY==1));
-				if( v1 && v2 )
+				if( v1 && v2 ) // if square is occupied by a red piece not on the fortress
 				{
 					r[xSpot,ySpot]=true;
 				}
 			}
 
 		}
-		else 
+		else // mirror image of white, canKill and onFort bools are activated when true so BoardManager Autoplay() can make decisions.
 		{
 //			Dice.GetComponent<ApplyForceinRandomDirection>().Roll(); // Get Black to Roll
 			step = Dice.GetComponent<DisplayCurrentDieValue> ().rollVal;// Get the dievalue
