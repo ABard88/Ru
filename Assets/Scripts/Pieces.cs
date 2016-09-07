@@ -231,7 +231,7 @@ public class Pieces : Pawns
 				bool v1,v2;
 				v1 = ((P1.isWhite) && (P1.CurrentX!=3) && (P1.CurrentY==1));
 				v2 = ((P1.isWhite) && (P1.CurrentX!=7) && (P1.CurrentY==1));
-				if( v1 && v2 )
+				if(v1 && v2)
 				{
 					canMove=true;
 					Kill=true;
@@ -240,7 +240,6 @@ public class Pieces : Pawns
 			}
 
 		}
-
 		return r;
 	}
 

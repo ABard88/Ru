@@ -86,112 +86,140 @@ public class BoardManager : MonoBehaviour
 		mainCam.enabled = !mainCam.enabled;
 		diceCam.enabled = !diceCam.enabled;
 	}
+	IEnumerator Delay(float waitTime)
+	{
+		if (!isWhiteTurn) 
+		{
+			yield return new WaitForSeconds (waitTime);
+			StartCoroutine (Autoplay (2.0f));
+			yield break;
+		} 
+		yield break;
+	}
 
 	IEnumerator Autoplay(float waitTime)
 	{
-		SwitchCam();
+//		SwitchCam();
 //		Dice.GetComponent<ApplyForceinRandomDirection>().Roll();
-		blacks= GameObject.FindGameObjectsWithTag("Black");
-		int[] pieceCounterX= new int[4];
-		int[] pieceCounterY=new int[4];
-		int i=0;
-		// insert foreach in a for loop where i= no. of pawns. check Gwent3PolCamp4
-		foreach(GameObject Black in blacks)
+		if (!isWhiteTurn)
 		{
-			pieceCounterX[i]= Black.GetComponent<Pieces>().CurrentX; //This tells current xspot of selected pawn
-			pieceCounterY[i]=Black.GetComponent<Pieces>().CurrentY; //This tells current yspot of selected pawn
-			i++;
-		}
-
-		// Write down code for SelectedPawn function
-		bool canMove = false;
-		int countPawn = 0;
-		bool canKill = false;
-		bool onFort = false;
-		while (countPawn< redTeam && canKill==false && onFort==false) 
-		{
-			allowedMoves = Pawns [pieceCounterX [countPawn], pieceCounterY [countPawn]].PossibleMove ();
-			for (int a=0; a<=9; a++)
-				for (int b=0; b<3; b++)
-					if (allowedMoves [a, b]) 
-					{
-						canMove = Pieces.canMove; // Find a way to use can move to check and move the pawn
-						canKill = Pieces.Kill;
-						onFort= Pieces.Fort;
-						Debug.Log ("Can Move");
-					}
-			if(canMove==true)
-			{
-				selectedPawn = Pawns [pieceCounterX [countPawn], pieceCounterY [countPawn]];
-				BoardHighlights.Instance.HighlightAllowedMoves (allowedMoves);
+			blacks = GameObject.FindGameObjectsWithTag ("Black");
+			int[] pieceCounterX = new int[4];
+			int[] pieceCounterY = new int[4];
+			int i = 0;
+			// insert foreach in a for loop where i= no. of pawns. check Gwent3PolCamp4
+			foreach (GameObject Black in blacks) {
+				pieceCounterX [i] = Black.GetComponent<Pieces> ().CurrentX; //This tells current xspot of selected pawn
+				pieceCounterY [i] = Black.GetComponent<Pieces> ().CurrentY; //This tells current yspot of selected pawn
+				i++;
 			}
-			countPawn++;
-		}
-		int pawnCounter=0;
-		if (canKill == false && onFort == false && countPawn == 4) 
-		{
-			selectedPawn = Pawns [pieceCounterX [pawnCounter], pieceCounterY [pawnCounter]]; //[0] This makes the 1st pawn move
-			allowedMoves = Pawns [pieceCounterX [pawnCounter], pieceCounterY [pawnCounter]].PossibleMove (); // write better logic to make the furthest one move.
-			int tempD=Pieces.xSpotP2;
-			int tempE=Pieces.ySpotP2;
-			if(tempD==7 && tempE==2) // Condition added so as not to move the pawn on to square 7,2
+			// Write down code for SelectedPawn function
+			bool canMove = false;
+			int countPawn = 0;
+			bool canKill = false;
+			bool onFort = false;
+			while (countPawn< redTeam && canKill==false && onFort==false) 
 			{
-				pawnCounter++;
-				selectedPawn = Pawns [pieceCounterX [pawnCounter], pieceCounterY [pawnCounter]];
-				allowedMoves = Pawns [pieceCounterX [pawnCounter], pieceCounterY [pawnCounter]].PossibleMove ();
+				allowedMoves = Pawns [pieceCounterX [countPawn], pieceCounterY [countPawn]].PossibleMove ();
+				for (int a=0; a<=9; a++)
+					for (int b=0; b<3; b++)
+						if (allowedMoves [a, b]) {
+							canMove = Pieces.canMove; // Find a way to use can move to check and move the pawn
+							canKill = Pieces.Kill;
+							onFort = Pieces.Fort;
+							Debug.Log ("Can Move");
+						}
+				if (canMove == true) {
+					selectedPawn = Pawns [pieceCounterX [countPawn], pieceCounterY [countPawn]];
+					BoardHighlights.Instance.HighlightAllowedMoves (allowedMoves);
+				}
+				countPawn++;
 			}
-		
-		}
-		//Write down code for MovePawn function [Re written]
-		int d = Pieces.xSpotP2; // These two numbers have to be equal to the bool value that is 
-		int e = Pieces.ySpotP2; // spit out by the Possible Move function in Pieces
-		if (allowedMoves [d, e]) 
-		{
-			Pawns P1 = Pawns [d, e];
-			if (P1 != null && P1.isWhite != isWhiteTurn) 
+			if (canKill == false && onFort == false && countPawn == redTeam)
 			{
-				//Capture Pawn and respawn at an empty space
-				activePawn.Remove (P1.gameObject);
-				bool replaced = false;
-				if (P1.isWhite) 
-				{
-					for (int c=3; c<7; c++) 
-					{
-						if (Pawns [c, 0] == null && replaced == false)
-						{
-							SpawnPawn (0, c, 0);
-							replaced = true;
+				int temp = Random.Range (0, redTeam);
+				selectedPawn = Pawns [pieceCounterX [temp], pieceCounterY [temp]]; //[0] This makes the 1st pawn move
+				allowedMoves = Pawns [pieceCounterX [temp], pieceCounterY [temp]].PossibleMove (); // write better logic to make the furthest one move.
+				int tempD = Pieces.xSpotP2;
+				int tempE = Pieces.ySpotP2;
+				if (tempD == 7 && tempE == 2) { // Condition added so as not to move the pawn on to square 7,2
+					selectedPawn = Pawns [pieceCounterX [Random.Range (0, redTeam)], pieceCounterY [Random.Range (0, redTeam)]];
+					allowedMoves = Pawns [pieceCounterX [Random.Range (0, redTeam)], pieceCounterY [Random.Range (0, redTeam)]].PossibleMove ();
+				}
+			
+			}
+			//Write down code for MovePawn function [Re written]
+			int d = Pieces.xSpotP2; // These two numbers have to be equal to the bool value that is 
+			int e = Pieces.ySpotP2; // spit out by the Possible Move function in Pieces
+			if (allowedMoves [d, e]) {
+				Pawns P1 = Pawns [d, e];
+				if (P1 != null && P1.isWhite) {
+					//Capture Pawn and respawn at an empty space
+					activePawn.Remove (P1.gameObject);
+					bool replaced = false;
+					if (P1.isWhite) {
+						for (int c=3; c<7; c++) {
+							if (Pawns [c, 0] == null && replaced == false) {
+								SpawnPawn (0, c, 0);
+								replaced = true;
+							}
 						}
 					}
+
+					Destroy (P1.gameObject);				
 				}
-
-				Destroy (P1.gameObject);				
+			}	
+			Pawns [selectedPawn.CurrentX, selectedPawn.CurrentY] = null;
+			selectedPawn.transform.position = GetTile (d, e);
+			selectedPawn.SetPosition (d, e);
+			Pawns [d, e] = selectedPawn;
+			moveCounter = moveCounter + 1;
+			Debug.Log ("Blacks=" + selectedPawn.CurrentX + "," + selectedPawn.CurrentY);
+			if (selectedPawn.CurrentX == 8 && selectedPawn.CurrentY == 2) {
+				scoreP2 = scoreP2 + 1;
+				Destroy (selectedPawn.gameObject);
+				redTeam--;
+			}			
+			if ((selectedPawn.CurrentX == 3 && selectedPawn.CurrentY == 1) || (selectedPawn.CurrentX == 7 && selectedPawn.CurrentY == 1) || (selectedPawn.CurrentX == 0 && selectedPawn.CurrentY == 2) || (selectedPawn.CurrentX == 8 && selectedPawn.CurrentY == 2)) {
+				isWhiteTurn = false;
+			} else {
+				isWhiteTurn = !isWhiteTurn;
 			}
-		}	
-		Pawns[selectedPawn.CurrentX,selectedPawn.CurrentY]=null;
-		selectedPawn.transform.position= GetTile(d,e);
-		selectedPawn.SetPosition(d,e);
-		Pawns[d,e]=selectedPawn;
-		moveCounter=moveCounter+1;
-		Debug.Log("Blacks="+selectedPawn.CurrentX+","+selectedPawn.CurrentY);
-		if(selectedPawn.CurrentX==8 && selectedPawn.CurrentY==2)
-		{
-			scoreP2=scoreP2+1;
-			Destroy(selectedPawn.gameObject);
-			redTeam--;
-		}			
-		if ((selectedPawn.CurrentX == 3 && selectedPawn.CurrentY == 1) || (selectedPawn.CurrentX == 7 && selectedPawn.CurrentY == 1) || (selectedPawn.CurrentX == 0 && selectedPawn.CurrentY == 2) || (selectedPawn.CurrentX == 8 && selectedPawn.CurrentY == 2)) {
-			isWhiteTurn = false;
-		} 
-		else
-			isWhiteTurn = !isWhiteTurn;
-
-		BoardHighlights.Instance.HideHighlights ();
-		selectedPawn = null;
+			BoardHighlights.Instance.HideHighlights ();
+			selectedPawn = null;
+		}
 		yield break;
 	}
-	
+	IEnumerator PlayerMove(float waitTime)
+	{
+		if (Input.GetMouseButtonDown (0)) // Input for selecting pawn
+		{
+			if(selectionX>=0 && selectionY>=0)
+			{
+				if(selectedPawn==null)
+				{
+					//Select Pawn by clicking on it.
+					SelectedPawn(selectionX,selectionY);
+				}
+				else
+				{
+					//Move Pawn
+					MovePawn(selectionX,selectionY);
+				}
+			}
+		}
+		yield break;
+	}
+	public void Play()
+	{
+		if (!isWhiteTurn) 
+		{
+			StartCoroutine (Delay (3.0f));
+		} 
+		else 
+			StartCoroutine(PlayerMove (3.0f));
 
+	}
 	private void Update()
 	{
 		string whoseTurn;
@@ -229,28 +257,9 @@ public class BoardManager : MonoBehaviour
 		{
 			blacWin.transform.localPosition=new Vector3(5,2,0);
 		}
-		// Calling computers turn
- 		if(!isWhiteTurn) 
-		{
-			StartCoroutine (Autoplay(1.0f));
-		}
 
-		if (Input.GetMouseButtonDown (0)) // Input for selecting pawn
-		{
-			if(selectionX>=0 && selectionY>=0)
-			{
-				if(selectedPawn==null)
-				{
-					//Select Pawn by clicking on it.
-					SelectedPawn(selectionX,selectionY);
-				}
-				else
-				{
-					//Move Pawn
-					MovePawn(selectionX,selectionY);
-				}
-			}
-		}
+		Play ();
+		// Calling computers turn
 	}
 
 	private void SelectedPawn(int x, int y) // function to select pawn
@@ -344,7 +353,9 @@ public class BoardManager : MonoBehaviour
 				isWhiteTurn=isWhiteTurn;
 			}
 			else
+			{
 				isWhiteTurn=!isWhiteTurn;
+			}
 		}
 		BoardHighlights.Instance.HideHighlights ();
 		selectedPawn = null;

@@ -9,10 +9,12 @@ public class BoardHighlights : MonoBehaviour
 	public GameObject highlightPrefab;
 	public GameObject fortressPrefab;
 	public GameObject highlightkhadan;
+	public GameObject compIndicator;
+	public GameObject playerIndicator;
 	private List<GameObject> highlights;
 	private List<GameObject> fortresses;
 	private List<GameObject> khadan;
-
+	private GameObject ct, pt;
 
 	private void Start()
 	{
@@ -22,7 +24,8 @@ public class BoardHighlights : MonoBehaviour
 		khadan = new List<GameObject> ();
 		HighlightFortress ();
 		Khadan ();
-
+		ct=Instantiate (compIndicator);
+		pt=Instantiate (playerIndicator);
 	}
 
 	private GameObject GetHighlightObject() 
@@ -95,6 +98,22 @@ public class BoardHighlights : MonoBehaviour
 	{
 		foreach(GameObject go in highlights)
 			go.SetActive(false);
+	}
+
+	public void Update()
+	{
+		bool who = BoardManager.isWhiteTurn;
+		if (!who) 
+		{
+			ct.transform.position = new Vector3 (2, 1, 3);
+			pt.transform.position = new Vector3 (20, 1, 3);
+		} 
+		else 
+		{
+			pt.transform.position = new Vector3 (2, 1, 3);
+			ct.transform.position = new Vector3 (20, 1, 3);
+		}
+
 	}
 
 }

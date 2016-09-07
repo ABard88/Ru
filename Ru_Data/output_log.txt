@@ -12,7 +12,7 @@ Platform assembly: X:\workspace\Ru\Ru_Data\Managed\Assembly-CSharp.dll (this mes
 Loading X:\workspace\Ru\Ru_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
 Platform assembly: X:\workspace\Ru\Ru_Data\Managed\UnityEngine.UI.dll (this message is harmless)
 Loading X:\workspace\Ru\Ru_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
-- Completed reload, in  0.191 seconds
+- Completed reload, in  0.255 seconds
 desktop: 1366x768 60Hz; virtual: 1366x768 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.
@@ -20,14 +20,14 @@ desktop: 1366x768 60Hz; virtual: 1366x768 at 0,0
 Platform assembly: X:\workspace\Ru\Ru_Data\Managed\System.Core.dll (this message is harmless)
 Platform assembly: X:\workspace\Ru\Ru_Data\Managed\System.dll (this message is harmless)
 Setting up 1 worker threads for Enlighten.
-  Thread -> id: 2934 -> priority: 1 
+  Thread -> id: 1f28 -> priority: 1 
 Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
-UnloadTime: 14.822034 ms
+UnloadTime: 14.288750 ms
 
-Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 676.
-Total: 0.434923 ms (FindLiveObjects: 0.033784 ms CreateObjectMapping: 0.032501 ms MarkObjects: 0.306627 ms  DeleteObjects: 0.060726 ms)
+Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 670.
+Total: 0.399000 ms (FindLiveObjects: 0.036350 ms CreateObjectMapping: 0.031646 ms MarkObjects: 0.271132 ms  DeleteObjects: 0.059443 ms)
 
-2,0
+1,0
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
 
@@ -39,7 +39,27 @@ Can Move
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
 
-Blacks=3,2
+Blacks=0,2
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+Can Move
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+Can Move
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+Can Move
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+Can Move
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+Blacks=1,2
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
 
